@@ -20,7 +20,6 @@ Builds images for Minikube regardsless of any existence.
 
 Builds images in ci environment and pushes them to eu.gcr.io
 
-
 # Images
 
 ## DBSetup
