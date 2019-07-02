@@ -1,21 +1,26 @@
-image="varnish"
+image_name="varnish"
+local_image=serlo/$(image_name)
 
-.PHONY: build_image
-build_image:
-	docker images | grep $(image) && echo "image $(image) already exists use build_image_forced" || $(MAKE) docker_build
+major_version=6
+minor_version=0
+patch_version=2
+
+include ../../mk/dockerci.mk
+
+
+
+.PHONY: docker_build_ci
+# builds the docker image in the ci and pushes it to eu.gcr.io
+docker_build_ci:
+	@../../scripts/check_changes.sh . ; if [ $$? != 0 ] ; then $(MAKE) docker_build && $(MAKE) docker_push; fi
+
+.PHONY: docker_build_minikube
+# checks if the docker images is in the remote docker and builds it if not
+docker_build_minikube:
+	docker images | grep $(local_image) && echo "image $(local_image) already exists use docker_build" || $(MAKE) docker_build
 
 .PHONY: docker_build
 # build the docker container
 docker_build:
 	docker build --build-arg git_revision=$(shell git log | head -n 1 | cut  -f 2 -d ' ') -t serlo/$(image) .
 
-.PHONY: docker_push
-# push the docker container to gcr repositoriy
-docker_push:
-	docker tag serlo/$(image):latest eu.gcr.io/serlo-containers/$(image):latest
-	docker push eu.gcr.io/serlo-containers/$(image):latest
-
-.PHONY: docker_run
-docker_run:
-# run the docker image
-	docker run --rm serlo/varnish:latest

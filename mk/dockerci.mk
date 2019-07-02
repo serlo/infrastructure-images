@@ -20,6 +20,8 @@ endif
 
 gce_image := eu.gcr.io/serlo-containers/$(image_name)
 
+patch_version ?= $(shell git log --pretty=format:'' | wc -l)
+
 .PHONY: docker_push
 # push docker container to gcr.io registry
 docker_push:
@@ -32,8 +34,8 @@ docker_push_impl:
 	docker push $(gce_image):$(major_version)
 	docker tag $(local_image):latest $(gce_image):$(major_version).$(minor_version)
 	docker push $(gce_image):$(major_version).$(minor_version)
-	docker tag $(local_image):latest $(gce_image):$(major_version).$(minor_version).$(shell git log --pretty=format:'' | wc -l)
-	docker push $(gce_image):$(major_version).$(minor_version).$(shell git log --pretty=format:'' | wc -l)
+	docker tag $(local_image):latest $(gce_image):$(major_version).$(minor_version).$(patch_version)
+	docker push $(gce_image):$(major_version).$(minor_version).$(patch_version)
 	docker tag $(local_image):latest $(gce_image):sha-$(shell git describe --dirty --always)
 	docker push $(gce_image):sha-$(shell git describe --dirty --always)
 
