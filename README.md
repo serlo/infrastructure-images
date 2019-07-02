@@ -12,10 +12,9 @@ You can get a list of all supported goals typing ```make help```.
 
 Builds images for Minikube only if they are not already available in the remote Minikube docker environment
 
-### build_images_forced
+### build_images_minikube_forced
 
-
-Builds images regardsless of any existence.
+Builds images for Minikube regardsless of any existence.
 
 ### build_images_ci
 
