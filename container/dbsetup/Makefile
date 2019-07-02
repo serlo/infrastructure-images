@@ -10,6 +10,9 @@ include ../../mk/dockerci.mk
 #every hour check if database is empty after initial check
 cron_pattern=0 0/1 * * *
 
+ci_build_image:
+	../../scripts/check_changes.sh . ; if [ $$? != 0 ] ; then $(MAKE) docker_build; fi
+
 .PHONY: build_image
 build_image:
 	docker images | grep $(local_image) && echo "image $(local_image) already exists use build_image_forced" || $(MAKE) docker_build
