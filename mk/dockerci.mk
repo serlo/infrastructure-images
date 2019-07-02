@@ -23,7 +23,7 @@ gce_image := eu.gcr.io/serlo-containers/$(image_name)
 .PHONY: docker_push
 # push docker container to gcr.io registry
 docker_push:
-	../../scripts/folder_changed.sh . ; if [ $$? != 0 ] ; then $(MAKE) docker_push_impl; fi
+	../../scripts/check_changes.sh . ; if [ $$? != 0 ] ; then $(MAKE) docker_push_impl; fi
 
 docker_push_impl:
 	docker tag $(local_image):latest $(gce_image):latest

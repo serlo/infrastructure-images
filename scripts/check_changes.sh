@@ -8,9 +8,9 @@ FOLDER_COMMIT=$(git log -1 --format=format:%H --full-diff $1)
 
 if [ $FOLDER_COMMIT = $LATEST_COMMIT ];
     then
-        echo "files in folder has changed";
+	    echo "files in folder $(pwd) has changed";
         exit 1;
 else
-     echo "no folders of relevance has changed";
+	echo "no files in folder $(pwd) have changed";
      exit 0;
 fi

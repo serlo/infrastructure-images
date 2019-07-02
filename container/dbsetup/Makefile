@@ -13,11 +13,7 @@ cron_pattern=0 0/1 * * *
 .PHONY: docker_build_ci
 # builds the docker image in the ci and pushes it to eu.gcr.io
 docker_build_ci:
-	../../scripts/check_changes.sh . ; if [ $$? != 0 ] ; then \
-		$(MAKE) docker_build; \
-	else \
-		$(MAKE) docker_push; \
-	fi
+	@../../scripts/check_changes.sh . ; if [ $$? != 0 ] ; then $(MAKE) docker_build && $(MAKE) docker_push; fi
 
 .PHONY: docker_build_minikube
 # checks if the docker images is in the remote docker and builds it if not
