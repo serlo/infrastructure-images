@@ -10,15 +10,23 @@ include ../../mk/dockerci.mk
 #every hour check if database is empty after initial check
 cron_pattern=0 0/1 * * *
 
-ci_build_image:
-	../../scripts/check_changes.sh . ; if [ $$? != 0 ] ; then $(MAKE) docker_build; fi
+.PHONY: docker_build_ci
+# builds the docker image in the ci and pushes it to eu.gcr.io
+docker_build_ci:
+	../../scripts/check_changes.sh . ; if [ $$? != 0 ] ; then \
+		$(MAKE) docker_build; \
+	else \
+		$(MAKE) docker_push; \
+	fi
 
-.PHONY: build_image
-build_image:
-	docker images | grep $(local_image) && echo "image $(local_image) already exists use build_image_forced" || $(MAKE) docker_build
+.PHONY: docker_build_minikube
+# checks if the docker images is in the remote docker and builds it if not
+docker_build_minikube:
+	docker images | grep $(local_image) && echo "image $(local_image) already exists use docker_build" || $(MAKE) docker_build
 
 .PHONY: docker_build
 # build the docker container
+# builds the docker image in the local docker environment
 docker_build:
 	docker build --build-arg git_revision=$(shell git log | head -n 1 | cut  -f 2 -d ' ') --build-arg cron_pattern="$(cron_pattern)" -t $(local_image) .
 

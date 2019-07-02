@@ -15,28 +15,36 @@ _help: help
 # forbid parallel building of prerequisites
 .NOTPARALLEL:
 
-.PHONY: build_image_%
+.PHONY: build_image_minikube%
 .ONESHELL:
-# build a specific docker image
+# build a specific docker image for minikube
 build_image_%:
 	@set -e
-	eval "$(DOCKER_ENV)" && if test -d container/$* ; then $(MAKE) -C container/$* build_image; fi
+	eval "$(DOCKER_ENV)" && if test -d container/$* ; then $(MAKE) -C container/$* build_image_minikube; fi
 
-.PHONY: build_image_forced_%
+.PHONY: build_image_minikube_forced_%
 .ONESHELL:
 # force rebuild of a specific docker image
 build_image_forced_%:
 	@set -e
 	eval "$(DOCKER_ENV)" && if test -d container/$* ; then $(MAKE) -C container/$* docker_build; fi
 
-.PHONY: build_images
+.PHONY: build_image_ci%
+# build a specific docker image for CI
+build_image_ci%:
+	$(MAKE) -C container/$* build_image_ci
+
+.PHONY: build_images_minikube
 # build docker images for local dependencies in the cluster
-build_images: $(foreach CONTAINER,$(IMAGES),build_image_$(CONTAINER))
+build_images: $(foreach CONTAINER,$(IMAGES),build_image_minikube_$(CONTAINER))
 
-.PHONY: build_images_forced
+.PHONY: build_images_minikube_forced
 # build docker images for local dependencies in the cluster (forced rebuild)
-build_images_forced: $(foreach CONTAINER,$(IMAGES),build_image_forced_$(CONTAINER))
+build_images_minikube_forced: $(foreach CONTAINER,$(IMAGES),build_image_minikube_forced_$(CONTAINER))
 
+.PHONY: build_images_ci
+# build docker images for local dependencies in the cluster
+build_images: $(foreach CONTAINER,$(IMAGES),build_image_ci_$(CONTAINER))
 
 
 # COLORS

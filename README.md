@@ -2,6 +2,28 @@
 
 Infrastructure Images are project independent docker images. The images are either built from a gcr.io base image or the github docker image is pulled and pushed to gcr.io.
 
+## Build
+
+The build is based mainly on docker. Only installation of Make is required.
+
+You can get a list of all supported goals typing ```make help```.
+
+### build_images_minikube
+
+Builds images for Minikube only if they are not already available in the remote Minikube docker environment
+
+### build_images_forced
+
+
+Builds images regardsless of any existence.
+
+### build_images_ci
+
+Builds images in ci environment and pushes them to eu.gcr.io
+
+
+# Images
+
 ## DBSetup
 
 Builds a cronjob image from alpine base image and adds some logic to import the serlo database from a dump.
