@@ -3,7 +3,7 @@ version := 6.2.2
 .PHONY: docker_build_ci
 # builds the docker image in the ci and pushes it to eu.gcr.io
 docker_build_ci:
-	@../../scripts/check_changes.sh . ; if [ $$? != 0 ] ; then $(MAKE) $(MAKE) docker_push_ci; fi
+	 docker pull eu.gcr.io/serlo-containers/${image_name}:$(version) 2>/dev/null >/dev/null || $(MAKE) docker_push
 
 .PHONY: docker_push_ci
 # push grafana image to gcr.io
