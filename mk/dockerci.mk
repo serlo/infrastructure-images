@@ -6,6 +6,10 @@ ifeq ($(image_name),)
 $(error image_name not defined)
 endif
 
+ifeq ($(version),)
+$(error version not defined)
+endif
+
 ifeq ($(local_image),)
 $(error local_image not defined)
 endif
@@ -34,8 +38,8 @@ docker_push_impl:
 	docker push $(gce_image):$(major_version)
 	docker tag $(local_image):latest $(gce_image):$(major_version).$(minor_version)
 	docker push $(gce_image):$(major_version).$(minor_version)
-	docker tag $(local_image):latest $(gce_image):$(major_version).$(minor_version).$(patch_version)
-	docker push $(gce_image):$(major_version).$(minor_version).$(patch_version)
+	docker tag $(local_image):latest $(version)
+	docker push $(gce_image):$(version)
 	docker tag $(local_image):latest $(gce_image):sha-$(shell git describe --dirty --always)
 	docker push $(gce_image):sha-$(shell git describe --dirty --always)
 
