@@ -1,4 +1,4 @@
-image_name="gsutil-base"
+image_name=gsutil-base
 local_image=serlo/$(image_name)
 
 #change version if you want to push a new image

@@ -1,4 +1,5 @@
-version := 6.2.2
+image_name=grafana
+version=6.2.2
 
 .PHONY: docker_build_ci
 # builds the docker image in the ci and pushes it to eu.gcr.io
