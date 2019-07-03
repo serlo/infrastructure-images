@@ -2,8 +2,7 @@
 # Makefile for local development for the serlo KPI project.
 #
 
-IMAGES := dbdump dbsetup varnish grafana
-
+IMAGES := gsutil-base dbdump dbsetup varnish grafana 
 include mk/help.mk
 
 .PHONY: _help
@@ -32,7 +31,7 @@ build_image_ci_%:
 
 .PHONY: build_images_minikube
 # build docker images for local dependencies in the cluster
-build_images: $(foreach CONTAINER,$(IMAGES),build_image_minikube_$(CONTAINER))
+build_images_minikube: $(foreach CONTAINER,$(IMAGES),build_image_minikube_$(CONTAINER))
 
 .PHONY: build_images_minikube_forced
 # build docker images for local dependencies in the cluster (forced rebuild)
