@@ -39,7 +39,7 @@ docker_push_impl:
 	docker tag $(local_image):latest $(gce_image):$(major_version).$(minor_version)
 	docker push $(gce_image):$(major_version).$(minor_version)
 	docker tag $(local_image):latest $(gce_image):$(version)
-	docker push $(gce_image) $(gce_image):$(version)
+	docker push $(gce_image):$(version)
 	docker tag $(local_image):latest $(gce_image):sha-$(shell git describe --dirty --always)
 	docker push $(gce_image):sha-$(shell git describe --dirty --always)
 
