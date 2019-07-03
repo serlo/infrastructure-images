@@ -29,9 +29,6 @@ patch_version ?= $(shell git log --pretty=format:'' | wc -l)
 .PHONY: docker_push
 # push docker container to gcr.io registry
 docker_push:
-	../../scripts/check_changes.sh . ; if [ $$? != 0 ] ; then $(MAKE) docker_push_impl; fi
-
-docker_push_impl:
 	docker tag $(local_image):latest $(gce_image):latest
 	docker push $(gce_image):latest
 	docker tag $(local_image):latest $(gce_image):$(major_version)
