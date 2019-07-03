@@ -10,3 +10,5 @@ CMD ["/bin/sh", "run.sh"]
 ARG git_revision
 ENV GIT_REVISION=$git_revision
 ENV GCLOUD_BUCKET=gs://serlo_dev_terraform
+ARG version
+ENV VERSION $version

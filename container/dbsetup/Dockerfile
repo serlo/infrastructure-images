@@ -7,4 +7,6 @@ ARG git_revision
 ENV GIT_REVISION=$git_revision
 ARG cron_pattern
 ENV CRON_PATTERN $cron_pattern
+ARG version
+ENV VERSION $version
 CMD ["/tmp/cron.sh"]

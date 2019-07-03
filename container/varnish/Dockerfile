@@ -15,4 +15,10 @@ ADD start.sh /tmp/start.sh
 ADD default.vcl /etc/varnish/default.vcl
 RUN chmod +x /tmp/start.sh
 
+ARG version
+ENV VERSION $version
+
+ARG git_revision
+ENV GIT_REVISION $git_revision
+
 CMD ["/tmp/start.sh"]

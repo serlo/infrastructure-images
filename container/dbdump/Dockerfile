@@ -11,4 +11,6 @@ ARG cron_pattern
 ENV CRON_PATTERN $cron_pattern
 ARG environment
 ENV ENVIRONMENT $environment
+ARG version
+ENV VERSION $version
 CMD ["/tmp/cron.sh"]
