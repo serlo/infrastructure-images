@@ -32,7 +32,11 @@ if [[ ! -f /tmp/dump.zip ]] ; then
     if [[ "${GCLOUD_BUCKET_URL}" != "" ]] ; then
         echo ${GCLOUD_SERVICE_ACCOUNT_KEY} >/tmp/service_account_key.json
         gcloud auth activate-service-account ${GCLOUD_SERVICE_ACCOUNT_NAME} --key-file /tmp/service_account_key.json
-        bucket_file="$(gsutil ls -l gs://anonymous-data | grep dump | sort -k 2 | awk '{ print $3 }')"
+        bucket_file=$(gsutil ls -l gs://anonymous-data | grep dump | sort -k 2 | awk '{ print $3 }')
+        if [[ "${bucket_file}" == "" ]] ; then
+            log_warn "no anonymous database dump available in gs://anonymous-data"
+            exit 1
+        fi
         gsutil cp ${bucket_file} /tmp/dump.zip
         log_info "latest dump ${bucket_file} downloaded from serlo-shared"
     fi
