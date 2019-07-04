@@ -1,4 +1,8 @@
 FROM alpine
+RUN apk update && apk add bash curl python python-dev py-pip build-base && rm -rf /var/cache/apk/*
+RUN curl https://sdk.cloud.google.com | bash >/dev/null
+ENV PATH=${PATH}:/root/google-cloud-sdk/bin:/root/google-cloud-sdk/platform/gsutil
+
 RUN apk update && apk add mysql-client unzip && rm -rf /var/cache/apk/*
 ADD ./cron.sh /tmp/
 ADD ./run.sh /tmp/run

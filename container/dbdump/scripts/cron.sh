@@ -18,4 +18,3 @@ else
     trap "kill $!" SIGINT SIGTERM
     wait
 fi
-

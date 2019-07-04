@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 log_info() {
     time=$(date +"%Y-%m-%dT%H:%M:%SZ")
     echo "{\"level\":\"info\",\"time\":\"$time\",\"message\":\"$1\"}"
@@ -15,14 +17,26 @@ log_warn() {
     echo "{\"level\":\"warn\",\"time\":\"$time\",\"message\":\"$1\"}"
 }
 
-exit_script() {
-  trap - SIGINT SIGTERM # clear the trap
-  log_warn "run script shutdown"
+retry() {
+    seconds=30
+    log_info "retrying in ${seconds} seconds"
+    sleep ${seconds}
 }
 
-trap exit_script SIGINT SIGTERM
+log_info "run athene2 dbsetup version $VERSION revision $GIT_REVISION"
 
-log_info "run athene2 dbsetup revision $GIT_REVISION"
+# add nameserver as currently alpine images dns seems not to work properly in GKE
+cat /etc/resolv.conf | grep 1.1.1.1 || printf "\nnameserver 1.1.1.1\n" >> /etc/resolv.conf
+
+if [[ ! -f /tmp/dump.zip ]] ; then
+    if [[ "${GCLOUD_BUCKET_URL}" != "" ]] ; then
+        echo ${GCLOUD_SERVICE_ACCOUNT_KEY} >/tmp/service_account_key.json
+        gcloud auth activate-service-account ${GCLOUD_SERVICE_ACCOUNT_NAME} --key-file /tmp/service_account_key.json
+        bucket_file="$(gsutil ls -l gs://anonymous-data | grep dump | sort -k 2 | awk '{ print $3 }')"
+        gsutil cp ${bucket_file} /tmp/dump.zip
+        log_info "latest dump ${bucket_file} downloaded from serlo-shared"
+    fi
+fi
 
 connect="-h $ATHENE2_DATABASE_HOST --port $ATHENE2_DATABASE_PORT -u $ATHENE2_DATABASE_USER -p$ATHENE2_DATABASE_PASSWORD"
 
@@ -35,36 +49,32 @@ done
 
 for retry in 1 2 3 4 5 6 7 8 9 10 ; do
     log_info "check if athene2 database exists"
-    sleep 10
     mysql $connect -e "SHOW DATABASES" | grep "serlo" >/dev/null 2>/dev/null && mysql $connect -e "USE serlo; SHOW TABLES;" | grep uuid >/dev/null 2>/dev/null
     if [[ $? != 0 ]] ; then
-        log_info "could not find serlo database lets import the latest dump"
+        log_info "could not find serlo database or atleast uuid table is missing - lets import the latest dump"
         if [[ -f /tmp/dump.zip ]] ; then
+            rm -f /tmp/dump.sql
             unzip /tmp/dump.zip -d /tmp
             if [[ $? != 0 ]] ; then
-                log_warn "could not unzip dump zip - failure"
-                exit 1
-            fi
-            mysql $connect </tmp/dump.sql
-            if [[ $? != 0 ]] ; then
-                log_warn "could not import serlo database from dump - trying later"
-                sleep 30
-                continue
-            else
-                log_info "import serlo database was successful"
-                exit 0
+                log_warn "could not unzip dump zip - failure" ; exit 1
             fi
         else
-            log_info "serlo database does not exists but no dump file present - trying later"
-            sleep 30
+            log_info "no dump zip file present"
+            retry
             continue
         fi
+            
+        mysql $connect </tmp/dump.sql
+        if [[ $? != 0 ]] ; then
+            log_warn "import dump failed" ; retry
+            continue
+        else
+            log_info "import serlo database was successful" ; exit 0
+        fi
     else
-        log_info "serlo database exists - nothing to do"
-        exit 0
+        log_info "serlo database exists - nothing to do" ; exit 0
     fi
-    log_info "serlo database does not exist - retry in 10 seconds"
+    log_info "serlo database does not exist" ; retry
 done
 
-log_info "serlo database does not exist - retry with cron"
-exit 1
+log_error "could not add dump - retrying with cron"

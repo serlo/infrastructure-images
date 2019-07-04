@@ -17,13 +17,6 @@ log_warn() {
     echo "{\"level\":\"warn\",\"time\":\"$time\",\"message\":\"$1\"}"
 }
 
-exit_script() {
-  trap - SIGINT SIGTERM # clear the trap
-  log_warn "run script shutdown"
-}
-
-trap exit_script SIGINT SIGTERM
-
 log_info "run anonymizer revision [$GIT_REVISION]"
 
 if [[ "$ATHENE2_DATABASE_HOST" == "" ]] ; then
