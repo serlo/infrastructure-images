@@ -28,7 +28,7 @@ if [[ "$ATHENE2_DATABASE_HOST" == "" ]] ; then
 fi
 
 set +e
-mysql $connect -e "SHOW DATABASES; USE serlo; SHOW TABLES;" >/dev/null 2>/dev/null | grep uuid >/dev/null 2>/dev/null
+mysql $connect -e "SHOW DATABASES; USE serlo; SHOW TABLES;" | grep uuid >/dev/null 2>/dev/null
 if [[ $? != 0 ]] ; then
     log_info "database serlo das not exist nothing to dump"
     exit 0

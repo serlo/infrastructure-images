@@ -10,7 +10,7 @@ if [[ "${ENVIRONMENT}" == "docker" ]] ; then
     /tmp/run
     exit 0
 else
-    log_info "start with cron pattern [${CRON_PATTERN}]"
+    log_info "start dbsdump version ${VERSION} revison ${GIT_REVISION} with cron pattern [${CRON_PATTERN}]"
     echo "${CRON_PATTERN} /tmp/run" | crontab -
     crond -f -L /dev/stdout &
 

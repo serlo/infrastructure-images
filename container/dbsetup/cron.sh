@@ -17,7 +17,7 @@ if [[ $? != 0 ]] ; then
     log_warn "initial athene2 dbsetup failed error [$?]"
 fi
 
-log_info "start with cron pattern [${CRON_PATTERN}]"
+log_info "start dbsetup version ${VERSION} revison ${GIT_REVISION} with cron pattern [${CRON_PATTERN}]"
 echo "${CRON_PATTERN} /tmp/run" | crontab -
 crond -f -L /dev/stdout &
 
