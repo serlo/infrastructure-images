@@ -35,28 +35,18 @@ if [[ $? != 0 ]] ; then
 fi
 set -e
 
-log_info "dump serlo database - start"
-
-log_info "dump database schema"
-mysqldump $connect \
-    --no-data \
-    --lock-tables=false \
-    --add-drop-database \
-    serlo \
-    > /tmp/dump.sql
-
 cd /tmp
 
+log_info "dump serlo database - start"
+log_info "dump database schema"
+
+mysqldump $connect --no-data --lock-tables=false --add-drop-database serlo >dump.sql
+
 log_info "dump database data"
-mysqldump $connect \
-    --no-create-info \
-    --lock-tables=false \
-    --add-locks \
-    serlo \
-    >> dump.sql
+mysqldump $connect --no-create-info --lock-tables=false --add-locks serlo >> dump.sql
 
 log_info "anonymize database dump"
-sed -i -r "/([0-9]+, ?)'[^']+\@[^']+', ?'[^']+', ?'[^']+',( ?[0-9]+, ?'[^']+', ?[0-9], ?)'[^']+'/ s//\1CONCAT\(LEFT\(UUID\(\), 8\),'@localhost'\), LEFT\(UUID\(\), 8\), '8a534960a8a4c8e348150a0ae3c7f4b857bfead4f02c8cbf0d',\2LEFT\(UUID\(\),
+sed -i -r "/([0-9]+, ?)'[^']+\@[^']+', ?'[^']+', ?'[^']+',( ?[0-9]+, ?'[^']+', ?[0-9], ?)'[^']+'/ s//\1CONCAT\(LEFT\(UUID\(\), 8\),'@localhost'\), LEFT\(UUID\(\), 8\), '8a534960a8a4c8e348150a0ae3c7f4b857bfead4f02c8cbf0d',\2LEFT\(UUID\(\), 8\)/" dump.sql
 
 log_info "compress database dump"
 rm -f *.zip
@@ -67,9 +57,8 @@ bucket_folder="${GCLOUD_BUCKET_URL}"
 if [[ "${bucket_folder}" != "" ]] ; then
     echo ${GCLOUD_SERVICE_ACCOUNT_KEY} >/tmp/service_account_key.json
     gcloud auth activate-service-account ${GCLOUD_SERVICE_ACCOUNT_NAME} --key-file /tmp/service_account_key.json
-    gsutil cp dump.zip ${bucket_folder}
+    gsutil cp dump.zip "${bucket_folder}"
     log_info "latest dump ${bucket_folder} uploaded to serlo-shared"
 fi
 
 log_info "dump of serlo database - end"
-
