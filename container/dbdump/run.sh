@@ -21,8 +21,6 @@ log_info "run athene2 dbdump version $VERSION revision $GIT_REVISION"
 
 connect="-h $ATHENE2_DATABASE_HOST --port $ATHENE2_DATABASE_PORT -u $ATHENE2_DATABASE_USER -p$ATHENE2_DATABASE_PASSWORD"
 
-log_info "run anonymizer revision [$GIT_REVISION]"
-
 if [[ "$ATHENE2_DATABASE_HOST" == "" ]] ; then
     log_fatal "database host not set"
 fi
@@ -50,14 +48,14 @@ sed -i -r "/([0-9]+, ?)'[^']+\@[^']+', ?'[^']+', ?'[^']+',( ?[0-9]+, ?'[^']+', ?
 
 log_info "compress database dump"
 rm -f *.zip
-cd zip "dump-$(date -I)".zip dump.sql >/dev/null
+zip "dump-$(date -I)".zip dump.sql >/dev/null
 
 bucket_folder="${GCLOUD_BUCKET_URL}"
 
 if [[ "${bucket_folder}" != "" ]] ; then
     echo ${GCLOUD_SERVICE_ACCOUNT_KEY} >/tmp/service_account_key.json
     gcloud auth activate-service-account ${GCLOUD_SERVICE_ACCOUNT_NAME} --key-file /tmp/service_account_key.json
-    gsutil cp dump.zip "${bucket_folder}"
+    gsutil cp dump-*.zip "${bucket_folder}"
     log_info "latest dump ${bucket_folder} uploaded to serlo-shared"
 fi
 
