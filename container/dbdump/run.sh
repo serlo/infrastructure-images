@@ -25,6 +25,8 @@ check_serlo_db() {
     done
 }
 
+log_info "run athene2 dbdump version $VERSION revision $GIT_REVISION"
+
 connect="-h $ATHENE2_DATABASE_HOST --port $ATHENE2_DATABASE_PORT -u $ATHENE2_DATABASE_USER -p$ATHENE2_DATABASE_PASSWORD"
 
 log_info "run anonymizer revision [$GIT_REVISION]"

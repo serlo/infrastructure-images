@@ -11,6 +11,7 @@ log_warn() {
 }
 
 log_info "run initial athene2 dbsetup"
+
 /tmp/run >/dev/stdout 2>&1
 if [[ $? != 0 ]] ; then
     log_warn "initial athene2 dbsetup failed error [$?]"
