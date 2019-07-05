@@ -27,8 +27,6 @@ if [[ "$ATHENE2_DATABASE_HOST" == "" ]] ; then
     log_fatal "database host not set"
 fi
 
-echo $connect
-
 set +e
 mysql $connect -e "SHOW DATABASES; USE serlo; SHOW TABLES;" >/dev/null 2>/dev/null | grep uuid >/dev/null 2>/dev/null
 if [[ $? != 0 ]] ; then
