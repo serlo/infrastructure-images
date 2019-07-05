@@ -1,5 +1,5 @@
 image_name=grafana
-version=6.2.2
+version=6.2.5
 local_image=grafana/$(image_name)
 gce_image=eu.gcr.io/serlo-shared/$(image_name)
 
@@ -15,6 +15,8 @@ docker_push_ci:
 	docker pull $(local_image):$(version)
 	docker tag $(local_image):$(version) $(gce_image):$(version);
 	docker push $(gce_image):$(version)
+	docker tag $(local_image):$(version) $(gce_image):latest;
+	docker push $(gce_image):latest
 
 .PHONY: docker_build_minikube
 # checks if the docker images is in the remote docker and builds it if not
