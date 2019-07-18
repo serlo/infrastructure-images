@@ -42,6 +42,7 @@ build_minikube_forced: $(foreach CONTAINER,$(IMAGES),build_minikube_forced_$(CON
 build_ci: $(foreach CONTAINER,$(IMAGES),build_ci_$(CONTAINER))
 
 
+
 # COLORS
 GREEN  := $(shell tput -Txterm setaf 2)
 YELLOW := $(shell tput -Txterm setaf 3)
