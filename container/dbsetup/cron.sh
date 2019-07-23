@@ -13,8 +13,9 @@ log_warn() {
 log_info "run initial athene2 dbsetup"
 
 /tmp/run >/dev/stdout 2>&1
-if [[ $? != 0 ]] ; then
-    log_warn "initial athene2 dbsetup failed error [$?]"
+
+if [ $? -ne 0 ] ; then
+    log_warn "initial athene2 dbsetup failed error [$error]"
 fi
 
 log_info "start dbsetup version ${VERSION} revison ${GIT_REVISION} with cron pattern [${CRON_PATTERN}]"
