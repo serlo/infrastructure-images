@@ -2,11 +2,11 @@
 # Makefile for local development for the serlo KPI project.
 #
 
-IMAGES := gsutil-base dbdump dbsetup varnish grafana 
+IMAGES := gsutil-base dbdump dbsetup mongodb-tools-base grafana varnish
 include mk/help.mk
 
 .PHONY: _help
-# print help as the default target. 
+# print help as the default target.
 # since hte actual help recipe is quite long, it is moved
 # to the bottom of this makefile.
 _help: help
