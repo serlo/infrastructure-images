@@ -12,3 +12,4 @@ ARG git_revision
 ENV GIT_REVISION=$git_revision
 ARG version
 ENV VERSION $version
+CMD ["/tmp/run.sh"]

@@ -4,7 +4,7 @@ local_image=serlo/$(image_name)
 #change version if you want to push a new image
 major_version=1
 minor_version=0
-patch_version=0
+patch_version=1
 version=$(major_version).$(minor_version).$(patch_version)
 
 include ../../mk/dockerci.mk
