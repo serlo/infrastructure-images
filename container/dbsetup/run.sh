@@ -38,12 +38,12 @@ done
 log_info "create serlo database if it's not there yet"
 mysql $connect -e "CREATE DATABASE IF NOT EXISTS serlo"
 
-[ -z "GCLOUD_BUCKET_URL" ] || { log_fatal "GCLOUD_BUCKET_URL not given"; exit 1; }
+[ -z "GCLOUD_BUCKET_URL" ] && { log_fatal "GCLOUD_BUCKET_URL not given"; exit 1; }
 
 echo $GCLOUD_SERVICE_ACCOUNT_KEY > /tmp/service_account_key.json
 gcloud auth activate-service-account ${GCLOUD_SERVICE_ACCOUNT_NAME} --key-file /tmp/service_account_key.json
 newest_dump_uri=$(gsutil ls -l gs://anonymous-data | grep dump | sort -rk 2 | head -n 1 | awk '{ print $3 }')
-[ -z "$newest_dump_uri" ] || { log_fatal "no database dump available in gs://anonymous-data"; exit 1; }
+[ -z "$newest_dump_uri" ] && { log_fatal "no database dump available in gs://anonymous-data"; exit 1; }
 newest_dump=$(basename $newest_dump_uri)
 [ -f "/tmp/$newest_dump" ] && exit 0
 
@@ -54,5 +54,5 @@ mysql $connect serlo < "/tmp/dump.sql" || { log_error "import of dump failed"; e
 log_info "imported serlo database dump $newest_dump"
 
 # delete all unnecessary files
-rm $(ls /tmp/dump*.zip | grep -v $newest_dump)
+rm -f $(ls /tmp/dump*.zip | grep -v $newest_dump)
 rm $(ls /tmp/dump.sql)
