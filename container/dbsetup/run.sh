@@ -35,49 +35,24 @@ do
     sleep 10
 done
 
-if [[ ! -f /tmp/dump.zip ]] ; then
-    if [[ "${GCLOUD_BUCKET_URL}" != "" ]] ; then
-        echo ${GCLOUD_SERVICE_ACCOUNT_KEY} >/tmp/service_account_key.json
-        gcloud auth activate-service-account ${GCLOUD_SERVICE_ACCOUNT_NAME} --key-file /tmp/service_account_key.json
-        bucket_file=$(gsutil ls -l gs://anonymous-data | grep dump | sort -rk 2 | sed 1q | awk '{ print $3 }')
-        if [[ "${bucket_file}" == "" ]] ; then
-            log_warn "no anonymous database dump available in gs://anonymous-data"
-            exit 1
-        fi
-        gsutil cp ${bucket_file} /tmp/dump.zip
-        log_info "latest dump ${bucket_file} downloaded from serlo-shared"
-        mysql $connect serlo -e "SET FOREIGN_KEY_CHECKS = 0; DROP TABLE IF EXISTS uuid; DROP TABLE IF EXISTS event_parameter_uuid"
-    fi
-fi
+log_info "create serlo database if it's not there yet"
+mysql $connect -e "CREATE DATABASE IF NOT EXISTS serlo"
 
-for retry in 1 2 3 4 5 6 7 8 9 10 ; do
-    log_info "check if athene2 database exists"
-    mysql $connect -e "SHOW DATABASES" | grep "serlo" >/dev/null 2>/dev/null && mysql $connect -e "USE serlo; SHOW TABLES;" | grep uuid >/dev/null 2>/dev/null
-    if [ $? -ne 0 ] ; then
-        log_info "could not find serlo database or atleast uuid table is missing - lets import the latest dump"
-        if [[ -f /tmp/dump.zip ]] ; then
-            rm -f /tmp/dump.sql
-            unzip /tmp/dump.zip -d /tmp
-            if [[ $? != 0 ]] ; then
-                log_warn "could not unzip dump zip - failure" ; exit 1
-            fi
-        else
-            log_info "no dump zip file present"
-            retry
-            continue
-        fi
+[ -z "GCLOUD_BUCKET_URL" ] || { log_fatal "GCLOUD_BUCKET_URL not given"; exit 1; }
 
-        mysql $connect serlo </tmp/dump.sql
-        if [[ $? != 0 ]] ; then
-            log_warn "import dump failed" ; retry
-            continue
-        else
-            log_info "import serlo database was successful" ; exit 0
-        fi
-    else
-        log_info "serlo database exists - nothing to do" ; exit 0
-    fi
-    log_info "serlo database does not exist" ; retry
-done
+echo $GCLOUD_SERVICE_ACCOUNT_KEY > /tmp/service_account_key.json
+gcloud auth activate-service-account ${GCLOUD_SERVICE_ACCOUNT_NAME} --key-file /tmp/service_account_key.json
+newest_dump_uri=$(gsutil ls -l gs://anonymous-data | grep dump | sort -rk 2 | head -n 1 | awk '{ print $3 }')
+[ -z "$newest_dump_uri" ] || { log_fatal "no database dump available in gs://anonymous-data"; exit 1; }
+newest_dump=$(basename $newest_dump_uri)
+[ -f "/tmp/$newest_dump" ] && exit 0
 
-log_error "could not add dump - retrying with cron"
+gsutil cp $newest_dump_uri "/tmp/$newest_dump"
+log_info "downloaded newest dump $newest_dump"
+unzip -o "$newest_dump" -d /tmp || { log_error "unzip of dump file failed"; exit 1; }
+mysql $connect serlo < "/tmp/dump.sql" || { log_error "import of dump failed"; exit 1; }
+log_info "imported serlo database dump $newest_dump"
+
+# delete all unnecessary files
+rm $(ls /tmp/dump*.zip | grep -v $newest_dump)
+rm $(ls /tmp/dump.sql)

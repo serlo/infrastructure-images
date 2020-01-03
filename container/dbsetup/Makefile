@@ -2,13 +2,13 @@ image_name=athene2-dbsetup-cronjob
 local_image=serlo/$(image_name)
 
 major_version=1
-minor_version=2
+minor_version=3
 patch_version=0
 version=$(major_version).$(minor_version).$(patch_version) 
 
 include ../../mk/dockerci.mk
 
-#every hour check if database is empty after initial check
+#every hour check if a new dump is available
 cron_pattern=0 0/1 * * *
 
 .PHONY: docker_build
