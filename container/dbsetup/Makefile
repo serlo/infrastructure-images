@@ -1,10 +1,10 @@
 image_name=athene2-dbsetup-cronjob
 local_image=serlo/$(image_name)
 
-major_version=1
-minor_version=3
-patch_version=2
-version=$(major_version).$(minor_version).$(patch_version) 
+major_version=2
+minor_version=0
+patch_version=0
+version=$(major_version).$(minor_version).$(patch_version)
 
 include ../../mk/dockerci.mk
 
