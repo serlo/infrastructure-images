@@ -49,9 +49,9 @@ newest_dump=$(basename $newest_dump_uri)
 
 gsutil cp $newest_dump_uri "/tmp/$newest_dump"
 log_info "downloaded newest dump $newest_dump"
-unzip -o "/tmp/$newest_dump" -d /tmp || { log_error "unzip of dump file failed"; exit 1; }
-mysql $connect serlo < "/tmp/dump.sql" || { log_error "import of dump failed"; exit 1; }
-mysql $connect -e "LOAD DATA LOCAL INFILE 'user.csv' INTO TABLE user FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 ROWS;" serlo || { log_error "import of dump failed"; exit 1; }
+unzip -o "/tmp/$newest_dump" -d /tmp || { log_fatal "unzip of dump file failed"; exit 1; }
+mysql $connect serlo < "/tmp/dump.sql" || { log_fatal "import of dump failed"; exit 1; }
+mysql $connect -e "LOAD DATA LOCAL INFILE '/tmp/user.csv' INTO TABLE user FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 ROWS;" serlo || { log_fatal "import of dump failed"; exit 1; }
 log_info "imported serlo database dump $newest_dump"
 
 # delete all unnecessary files
