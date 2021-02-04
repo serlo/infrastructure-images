@@ -1,5 +1,5 @@
 FROM alpine
-RUN apk update && apk add bash curl python python-dev py-pip build-base && rm -rf /var/cache/apk/*
+RUN apk update && apk add bash curl python3 python3-dev py-pip build-base && rm -rf /var/cache/apk/*
 RUN curl https://sdk.cloud.google.com | bash >/dev/null
 ENV PATH=${PATH}:/root/google-cloud-sdk/bin:/root/google-cloud-sdk/platform/gsutil
 ADD run.sh /tmp/run.sh
