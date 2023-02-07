@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:18-alpine
 
 COPY ./script.js /tmp/
 COPY ./package.json /tmp/
