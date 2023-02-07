@@ -2,11 +2,9 @@
 const nodemailer = require("nodemailer");
 const fetch = require("node-fetch");
 
-const users = ["quinn@serlo.org"];
 
 // async..await is not allowed in global scope, must use a wrapper
 async function main() {
-  // get data from simple analytics
   const data = await fetch(
     "https://simpleanalytics.com/api/export/datapoints?version=5&format=json&hostname=de.serlo.org" +
       "&start=today&end=today&robots=false&timezone=Europe%2FBerlin&fields=datapoint&type=events",
@@ -26,8 +24,8 @@ async function main() {
 
   const mailBase = {
     from: '"Serlo" <quinn@serlo.org>', // sender address
-    subject: "Danke!", // Subject line
-    text: "Heute haben " + numberofThanks + " Serlo-Nutzer*innen Danke gesagt!", // plain text body
+    subject: "Danke!",
+    text: "Heute haben " + numberofThanks + " Serlo-Nutzer*innen Danke gesagt!",
     html: `
     
         <img style="display:block;margin-left:auto;margin-right:auto;" src="cid:serlo@serlo.org" />
@@ -52,7 +50,7 @@ async function main() {
           Schreibe an <a href="mailto:quinn@serlo.org">quinn@serlo.org</a> oder antworte auf diese E-Mail, um Feedback zu geben bzw. den Verteiler zu verlassen.
         </small>
     
-    `, // html body
+    `,
     attachments: [
       {
         filename: "serlo_logo.png",
@@ -70,20 +68,11 @@ async function main() {
   };
 
   // create reusable transporter object using the default SMTP transport
-  let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: "quinn@serlo.org", // generated ethereal user
-      pass: process.env.MAIL_PASSWORD, // generated ethereal password
-    },
-  });
+  let transporter = nodemailer.createTransport($SMTP_URI);
 
-  // send mail with defined transport object
   let info = await transporter.sendMail({
     ...mailBase,
-    to: "quinn@serlo.org",
+    to: $EMAIL_DISTRIBUTOR
   });
 
   console.log("Message sent: %s", info.messageId);
