@@ -16,8 +16,8 @@ RUN echo "host all  all    0.0.0.0/0  md5" >> /var/lib/postgresql/data/pg_hba.co
 RUN echo "listen_addresses='*'" >> /var/lib/postgresql/data/postgresql.conf
 RUN pg_ctl start -D /var/lib/postgresql/data
 
-COPY . /tmp
 WORKDIR /tmp
+COPY . .
 
 ARG git_revision
 ENV GIT_REVISION=$git_revision
