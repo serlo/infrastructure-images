@@ -30,18 +30,40 @@ done
 mysqldump $mysql_connect --no-create-info --lock-tables=false --add-locks --where "field = 'interests' and value = 'teacher'" serlo user_field >>mysql.sql
 mysql $mysql_connect --batch -e "SELECT id, concat(@rn:=@rn+1, '@localhost') as email, username, '8a534960a8a4c8e348150a0ae3c7f4b857bfead4f02c8cbf0d' AS password, logins, date, concat(@rn:=@rn+1, '') as token, last_login, description FROM user, (select @rn:=2) r;" serlo >user.csv
 
+log_info "dump identities data"
+
 export PGPASSWORD=$POSTGRES_PASSWORD
 postgres_connect="--host=${POSTGRES_HOST} --user=serlo kratos"
+# export the production data and then import it into local database to easier manipulate it. Better idea?
 pg_dump $postgres_connect >temp.sql
 psql --quiet -c "create user serlo;"
 psql --quiet -c "create database kratos;"
 psql --quiet -c "grant all privileges on database kratos to serlo;"
 psql -d kratos <temp.sql
 rm temp.sql
+# hash emails to anonymize them. We could even use a salt to make it more difficult to hack.
+# Since we have many tables to insert the email, the solution used in mysql doesn't seem easy to implement (or am I wrong?).
 psql --quiet kratos -c "UPDATE identity_credentials SET config = '{\"hashed_password\": \"\$sha1\$pf=e1NBTFR9e1BBU1NXT1JEfQ==\$YTQwYzEwY2ZlNA==\$hTlqikjjSFoK43S4V7+t8CyMvw0=\"}';"
 psql --quiet kratos -c "UPDATE identity_verifiable_addresses SET value = concat(md5(value), '@localhost');"
+psql --quiet kratos -c "UPDATE identity_credential_identifiers SET identifier = concat(md5(identifier), '@localhost');"
+psql --quiet kratos -c "UPDATE identity_recovery_addresses SET value = concat(md5(value), '@localhost');"
 psql --quiet kratos -c "UPDATE identities SET traits = JSONB_SET(traits, '{email}', TO_JSONB(CONCAT(md5(traits ->> 'email'), '@localhost')));"
 psql --quiet kratos -c "TRUNCATE sessions CASCADE;"
+psql --quiet kratos -c "TRUNCATE continuity_containers CASCADE;"
+psql --quiet kratos -c "TRUNCATE courier_messages CASCADE;"
+psql --quiet kratos -c "TRUNCATE sessions CASCADE;"
+# TODO: check if some of these tables are needed. Otherwise, truncate them/dump without data
+#  identity_recovery_codes
+#  identity_recovery_tokens
+#  identity_verification_tokens
+#  networks
+#  selfservice_errors
+#  selfservice_login_flows
+#  selfservice_recovery_flows
+#  selfservice_registration_flows
+#  selfservice_settings_flows
+#  selfservice_verification_flows
+#  session_devices
 pg_dump kratos >postgres.sql
 
 log_info "compress database dump"
