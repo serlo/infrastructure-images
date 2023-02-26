@@ -1,5 +1,5 @@
 image_name=athene2-dbdump-cronjob
-local_image=serlo/$(image_name)
+local_image=eu.gcr.io/serlo-shared/$(image_name)
 
 # change version if you want to push a new image
 major_version=3
@@ -11,4 +11,4 @@ include ../../mk/dockerci.mk
 
 .PHONY: docker_build
 docker_build:
-	docker build --build-arg version=$(version) --build-arg git_revision=$(shell git log | head -n 1 | cut  -f 2 -d ' ') -t $(local_image) .
+	docker build --build-arg version=$(version) --build-arg git_revision=$(shell git log | head -n 1 | cut  -f 2 -d ' ') -t $(local_image):$(version) .
