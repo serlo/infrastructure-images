@@ -55,9 +55,9 @@ rm -f *.zip
 zip "dump-$(date -I)".zip mysql.sql user.csv kratos.sql >/dev/null
 
 cat <<EOF | gcloud auth activate-service-account --key-file=-
-${bucket_service_account_key}
+${BUCKET_SERVICE_ACCOUNT_KEY}
 EOF
-gsutil cp dump-*.zip "${bucket_url}"
-log_info "latest dump ${bucket_url} uploaded to serlo-shared"
+gsutil cp dump-*.zip "${BUCKET_URL}"
+log_info "latest dump ${BUCKET_URL} uploaded to serlo-shared"
 
 log_info "dump of serlo.org database - end"
