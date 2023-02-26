@@ -53,7 +53,7 @@ export PGPASSWORD=$POSTGRES_PASSWORD
 postgres_connect="--host=${POSTGRES_HOST} --user=serlo kratos"
 psql $postgres_connect -c "DROP DATABASE kratos"
 psql $postgres_connect -c "CREATE DATABASE kratos"
-psql $postgres_connect <postgres.sql
+psql $postgres_connect <kratos.sql
 
 # delete all unnecessary files
 rm -f $(ls /tmp/dump*.zip | grep -v $newest_dump)
