@@ -6,7 +6,7 @@ source ./utils.sh
 
 log_info "run dbdump version $VERSION revision $GIT_REVISION"
 
-mysql_connect="--host=${MYSQL_HOST} --port=${MYSQL_PORT} --user=${MYSQL_USER} --password=${MYSQL_PASSWORD}"
+mysql_connect="--host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASSWORD}"
 
 set +e
 mysql $mysql_connect -e "SHOW DATABASES; USE serlo; SHOW TABLES;" | grep uuid >/dev/null 2>/dev/null
@@ -19,7 +19,7 @@ set -e
 cd /tmp
 
 log_info "dump serlo.org database - start"
-log_info "dump database schema"
+log_info "dump legacy serlo database schema"
 
 mysqldump $mysql_connect --no-data --lock-tables=false --add-drop-database serlo >mysql.sql
 
@@ -30,11 +30,10 @@ done
 mysqldump $mysql_connect --no-create-info --lock-tables=false --add-locks --where "field = 'interests' and value = 'teacher'" serlo user_field >>mysql.sql
 mysql $mysql_connect --batch -e "SELECT id, CONCAT(@rn:=@rn+1, '@localhost') AS email, username, '8a534960a8a4c8e348150a0ae3c7f4b857bfead4f02c8cbf0d' AS password, logins, date, CONCAT(@rn:=@rn+1, '') AS token, last_login, description FROM user, (select @rn:=2) r;" serlo >user.csv
 
-log_info "dump identities data"
-
+log_info "dump kratos identities data"
 export PGPASSWORD=$POSTGRES_PASSWORD
-postgres_connect="--host=${POSTGRES_HOST} --user=serlo kratos"
-pg_dump $postgres_connect >temp.sql
+pg_dump --host=${POSTGRES_HOST} --user=serlo kratos >temp.sql
+pg_ctl start -D /var/lib/postgresql/data
 psql --quiet -c "create user serlo;"
 psql --quiet -c "create database kratos;"
 psql --quiet -c "grant all privileges on database kratos to serlo;"
