@@ -46,7 +46,7 @@ psql --quiet kratos -c "UPDATE identity_credentials SET config = '{\"hashed_pass
 psql --quiet kratos -c "UPDATE identity_verifiable_addresses SET value = CONCAT(identity_id, '@localhost');"
 psql --quiet kratos -c "UPDATE identity_recovery_addresses SET value = CONCAT(identity_id, '@localhost');"
 psql --quiet kratos -c "UPDATE identity_credential_identifiers SET identifier = CONCAT(ic.identity_id, '@localhost') FROM (select id, identity_id FROM identity_credentials) AS ic where ic.id = identity_credential_id and identifier LIKE '%@%';"
-psql --quiet kratos -c "TRUNCATE sessions, continuity_containers, courier_messages, identity_recovery_codes, identity_recovery_tokens, identity_verification_tokens, networks, selfservice_errors, selfservice_login_flows, selfservice_recovery_flows, selfservice_registration_flows, selfservice_settings_flows, selfservice_verification_flows, session_devices CASCADE;"
+psql --quiet kratos -c "TRUNCATE sessions, continuity_containers, courier_messages, identity_recovery_codes, identity_recovery_tokens, identity_verification_tokens, selfservice_errors, selfservice_login_flows, selfservice_recovery_flows, selfservice_registration_flows, selfservice_settings_flows, selfservice_verification_flows, session_devices CASCADE;"
 pg_dump kratos >kratos.sql
 
 log_info "compress database dump"
