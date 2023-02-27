@@ -31,8 +31,8 @@ mysqldump $mysql_connect --no-create-info --lock-tables=false --add-locks --wher
 mysql $mysql_connect --batch -e "SELECT id, CONCAT(@rn:=@rn+1, '@localhost') AS email, username, '8a534960a8a4c8e348150a0ae3c7f4b857bfead4f02c8cbf0d' AS password, logins, date, CONCAT(@rn:=@rn+1, '') AS token, last_login, description FROM user, (select @rn:=2) r;" serlo >user.csv
 
 log_info "dump kratos identities data"
-export PGPASSWORD=$POSTGRES_PASSWORD
-pg_dump --host=${POSTGRES_HOST} --user=serlo kratos >temp.sql
+export PGPASSWORD=$POSTGRES_PASSWORD_READONLY
+pg_dump --host=${POSTGRES_HOST} --user=serlo_readonly kratos >temp.sql
 pg_ctl start -D /var/lib/postgresql/data
 psql --quiet -c "create user serlo;"
 psql --quiet -c "create database kratos;"
