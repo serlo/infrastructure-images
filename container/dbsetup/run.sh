@@ -55,6 +55,7 @@ export PGPASSWORD=$POSTGRES_PASSWORD
 postgres_connect="--host=${POSTGRES_HOST} --user=serlo kratos"
 psql $postgres_connect -c "DROP SCHEMA public CASCADE;"
 psql $postgres_connect -c "CREATE SCHEMA public;"
+psql $postgres_connect -c "GRANT ALL ON SCHEMA public TO serlo;"
 psql $postgres_connect <kratos.sql
 
 # delete all unnecessary files
