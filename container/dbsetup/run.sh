@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 source ./utils.sh
 
 log_info "run dbsetup version $VERSION revision $GIT_REVISION"
@@ -51,8 +53,8 @@ log_info "imported serlo database dump $newest_dump"
 
 export PGPASSWORD=$POSTGRES_PASSWORD
 postgres_connect="--host=${POSTGRES_HOST} --user=serlo kratos"
-psql $postgres_connect -c "DROP DATABASE kratos"
-psql $postgres_connect -c "CREATE DATABASE kratos"
+psql $postgres_connect -c "DROP SCHEMA public CASCADE;"
+psql $postgres_connect -c "CREATE SCHEMA public;"
 psql $postgres_connect <kratos.sql
 
 # delete all unnecessary files
