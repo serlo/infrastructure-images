@@ -16,8 +16,6 @@ if [[ $? != 0 ]]; then
 fi
 set -e
 
-cd /tmp
-
 log_info "dump serlo.org database - start"
 log_info "dump legacy serlo database schema"
 
@@ -41,7 +39,7 @@ psql -d kratos <temp.sql
 rm temp.sql
 
 psql --quiet kratos -c "UPDATE identities SET traits = JSONB_SET(traits, '{email}', TO_JSONB(CONCAT(id, '@localhost')));"
-psql --quiet kratos -c "UPDATE identities SET traits = JSONB_SET(traits, '{insterest}', '\"\"') where traits ->> 'interest' != 'teacher';"
+psql --quiet kratos -c "UPDATE identities SET traits = JSONB_SET(traits, '{interest}', '\"\"') where traits ->> 'interest' != 'teacher';"
 psql --quiet kratos -c "UPDATE identity_credentials SET config = '{\"hashed_password\": \"\$sha1\$pf=e1NBTFR9e1BBU1NXT1JEfQ==\$YTQwYzEwY2ZlNA==\$hTlqikjjSFoK43S4V7+t8CyMvw0=\"}';"
 psql --quiet kratos -c "UPDATE identity_verifiable_addresses SET value = CONCAT(identity_id, '@localhost');"
 psql --quiet kratos -c "UPDATE identity_recovery_addresses SET value = CONCAT(identity_id, '@localhost');"
