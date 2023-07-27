@@ -32,9 +32,11 @@ log_info "dump kratos identities data"
 export PGPASSWORD=$POSTGRES_PASSWORD_READONLY
 pg_dump --host=${POSTGRES_HOST} --user=serlo_readonly kratos >temp.sql
 pg_ctl start -D /var/lib/postgresql/data
-psql --quiet -c "create user serlo;"
-psql --quiet -c "create database kratos;"
-psql --quiet -c "grant all privileges on database kratos to serlo;"
+psql --quiet -c "CREATE user serlo;"
+psql --quiet -c "CREATE user serlo_readonly;"
+psql --quiet -c "CREATE database kratos;"
+psql --quiet -c "GRANT ALL PRIVILEGES ON DATABASE kratos TO serlo;"
+psql --quiet -c "GRANT SELECT ON ALL TABLES IN SCHEMA public TO serlo_readonly;"
 psql -d kratos <temp.sql
 rm temp.sql
 
@@ -44,7 +46,7 @@ psql --quiet kratos -c "UPDATE identity_credentials SET config = '{\"hashed_pass
 psql --quiet kratos -c "UPDATE identity_verifiable_addresses SET value = CONCAT(identity_id, '@localhost');"
 psql --quiet kratos -c "UPDATE identity_recovery_addresses SET value = CONCAT(identity_id, '@localhost');"
 psql --quiet kratos -c "UPDATE identity_credential_identifiers SET identifier = CONCAT(ic.identity_id, '@localhost') FROM (select id, identity_id FROM identity_credentials) AS ic where ic.id = identity_credential_id and identifier LIKE '%@%';"
-psql --quiet kratos -c "TRUNCATE sessions, continuity_containers, courier_messages, identity_verification_codes, identity_recovery_codes, identity_recovery_tokens, identity_verification_tokens, selfservice_errors, selfservice_login_flows, selfservice_recovery_flows, selfservice_registration_flows, selfservice_settings_flows, selfservice_verification_flows, session_devices CASCADE;"
+psql --quiet kratos -c "TRUNCATE sessions, continuity_containers, courier_messages, identity_verification_codes, identity_recovery_codes, identity_recovery_tokens, identity_verification_tokens, selfservice_errors, selfservice_login_flows, selfservice_recovery_flows, selfservice_registration_flows, selfservice_settings_flows, selfservice_verification_flows, session_devices, session_token_exchanges CASCADE;"
 pg_dump kratos >kratos.sql
 
 log_info "compress database dump"
