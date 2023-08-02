@@ -35,7 +35,7 @@ pg_ctl start -D /var/lib/postgresql/data
 psql --quiet -c "CREATE user serlo;"
 psql --quiet -c "CREATE user serlo_readonly;"
 psql --quiet -c "CREATE database kratos;"
-psql --quiet -c "GRANT ALL PRIVILEGES ON DATABASE kratos TO serlo;"
+psql --quiet -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO serlo;"
 psql --quiet -c "GRANT SELECT ON ALL TABLES IN SCHEMA public TO serlo_readonly;"
 psql -d kratos <temp.sql
 rm temp.sql
