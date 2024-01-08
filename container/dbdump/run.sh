@@ -21,9 +21,8 @@ log_info "dump legacy serlo database schema"
 
 mysqldump $mysql_connect --no-data --lock-tables=false --add-drop-database serlo >mysql.sql
 
-for table in comment comment_status entity entity_link entity_revision entity_revision_field event event_log event_parameter event_parameter_name event_parameter_string event_parameter_uuid instance license migrations notification notification_event page_repository page_revision role role_user subscription taxonomy term term_taxonomy term_taxonomy_entity type url_alias uuid; do
-    mysqldump $mysql_connect --no-create-info --lock-tables=false --add-locks serlo $table >>mysql.sql
-done
+mysqldump $mysql_connect --no-create-info --lock-tables=false --add-locks --ignore-table=serlo.user serlo >>mysql.sql
+
 # just dump teachers for data protection reasons
 mysqldump $mysql_connect --no-create-info --lock-tables=false --add-locks --where "field = 'interests' and value = 'teacher'" serlo user_field >>mysql.sql
 mysql $mysql_connect --batch -e "SELECT id, CONCAT(@rn:=@rn+1, '@localhost') AS email, username, '8a534960a8a4c8e348150a0ae3c7f4b857bfead4f02c8cbf0d' AS password, logins, date, CONCAT(@rn:=@rn+1, '') AS token, last_login, description FROM user, (select @rn:=2) r;" serlo >user.csv
