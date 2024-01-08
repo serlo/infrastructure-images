@@ -6,7 +6,12 @@ Infrastructure Images are project independent docker images. The images are eith
 
 The build is based mainly on docker. Only installation of Make is required.
 
-You can get a list of all supported goals typing ```make help```.
+You can get a list of all supported goals typing `make help`.
+
+### Building specific images manually
+
+Use `make build_ci_?` (replace ? for the name of the image, v.g. `make build_ci_dbdump`)
+for building and pushing to registry a specific image manually.
 
 ### build_images_minikube
 
@@ -18,7 +23,8 @@ Builds images for Minikube regardsless of any existence.
 
 ### build_images_ci
 
-Builds images in ci environment and pushes them to eu.gcr.io
+Builds images in ci environment and pushes them to eu.gcr.io.
+Note: Currently not working, because Github workflow is missing.
 
 # Images
 
