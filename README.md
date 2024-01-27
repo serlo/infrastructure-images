@@ -1,3 +1,7 @@
+## Deprecation Note:
+This repo is archived in favor of [serlo/infra](https://github.com/serlo/infra)
+--
+
 # infrastructure-images
 
 Infrastructure Images are project independent docker images. The images are either built from a gcr.io base image or the github docker image is pulled and pushed to gcr.io.
